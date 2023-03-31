@@ -1,5 +1,5 @@
 ---
-- hosts: cloud_1
+- hosts: cloud1
   become: yes
   become_user: root
   strategy: free

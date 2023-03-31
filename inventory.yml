@@ -5,12 +5,12 @@ all:
   children:
     cloud_1:
       hosts:
-        cloud-1:
+        cloud-1-host:
       vars:
         ansible_python_interpreter: /usr/bin/python3
       children:
         cloud_1:
           hosts:
-            cloud-1:
-              ansible_host: cloud-1-host-domain
+            cloud-1-host:
+              ansible_host: cloud-1-domain
               ansible_port: 22
