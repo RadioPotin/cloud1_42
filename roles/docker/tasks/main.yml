@@ -4,7 +4,7 @@
     path: /home/user42/{{ docker_version }}.sh
   register: docker
 
-- name: Uninstall previous docker installs
+- name: Uninstall previous docker installations
   apt:
     pkg:
       - docker
