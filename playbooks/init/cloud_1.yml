@@ -1,0 +1,16 @@
+---
+- hosts: cloud_1
+  become: yes
+  become_user: root
+  strategy: free
+  roles:
+    - update
+    - user
+    - hosts
+    - docker
+#    - nginx
+#    - mysql
+#    - phpmyadmin
+#    - wordpress
+#    - cloud-1
+#    - ufw

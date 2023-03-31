@@ -1,0 +1,5 @@
+vault_mysql_root_password: mysqlpass
+vault_mysql_user_password: mysqluser
+vault_cloud_1_users:
+  dapinto: dapinto
+  pgueugno: pgueugno

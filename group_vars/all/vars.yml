@@ -1,0 +1,8 @@
+---
+cloud_1_users: "{{ vault_cloud_1_users }}"
+
+docker_version: "20.10"
+nginx_container_port: 80
+nginx_port: 80
+nginx_container_port_ssl: 443
+nginx_port_ssl: 443

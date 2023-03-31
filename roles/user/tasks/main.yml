@@ -1,0 +1,21 @@
+---
+- name: Configure user42 group
+  group:
+    name: user42
+    state: present
+
+- name: Set user42 group as sudoer without passwd
+  lineinfile:
+    path: /etc/sudoers
+    line: "%user42 ALL=(ALL) NOPASSWD: ALL"
+    backup: yes
+
+- name: Set default cloud-1 users
+  user:
+    name: "{{ item.key }}"
+    password: "{{ item.value.password | password_hash('sha512') }}"
+    update_password: on_create
+    group: user42
+    state: present
+    shell: /bin/bash
+  loop: "{{ lookup('dict', cloud_1_users) }}"
