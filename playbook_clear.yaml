@@ -1,0 +1,17 @@
+---
+- name: Clear training vm
+  hosts: virtualmachines
+  vars:
+    index_root: "/var/www/html"
+    sites_enabled: "/etc/nginx/sites-enabled"
+    sites_available: "/etc/nginx/sites-available"
+  tasks:
+  - name: remove nginx
+    apt:
+      pkg: nginx
+      state: absent
+      purge: yes
+  - name: autoremove dangling packages
+    apt:
+      autoremove: yes
+      autoclean: yes

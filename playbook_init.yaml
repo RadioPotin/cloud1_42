@@ -1,0 +1,58 @@
+---
+- name: Testing training vm
+  hosts: virtualmachines
+  vars:
+    index_root: "/var/www/html"
+    sites_enabled: "/etc/nginx/sites-enabled"
+    sites_available: "/etc/nginx/sites-available"
+  tasks:
+  - name: ping hosts
+    ping:
+  - name: print basic test msg
+    debug:
+      msg: Everything seems OK
+
+  - name: Update apt cache
+    apt:
+      update_cache: yes
+      cache_valid_time: 3600
+    become: yes
+
+  - name: Install Nginx
+    apt:
+      name: ['nginx']
+      state: latest
+    become: yes
+
+  # - name: Start nginx
+  #   service:
+  #     name: nginx
+  #     state: started
+  #   become: yes
+
+  - name: Config nginx
+    block:
+      - name: copy nginx config
+        copy:
+          src: nginx/training_nginx
+          dest: "{{sites_available}}/"
+      - name: create symbolic link
+        file:
+          src: "{{sites_available}}/training_nginx"
+          dest: "{{sites_enabled}}/training_nginx"
+          state: link
+      - name: delete default nginx config
+        file:
+          path: "{{sites_enabled}}/default"
+          state: absent
+      - name: copy welcome page
+        copy:
+          src: nginx/welcome.html
+          dest: "{{index_root}}/"
+    become: yes
+
+  - name: Restart nginx
+    service:
+      name: nginx
+      state: restarted
+    become: yes

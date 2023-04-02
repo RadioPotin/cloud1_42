@@ -1,0 +1,27 @@
+---
+- name: Testing training vm with enix nginx role
+  hosts: virtualmachines
+  pre_tasks:
+  - name: ping hosts
+    ping:
+  - name: print basic test msg
+    debug:
+      msg: Everything seems OK
+  - name:
+    apt:
+      name: gpg
+      state: latest
+  - name: Update apt cache
+    apt:
+      update_cache: yes
+      cache_valid_time: 3600
+
+  roles:
+    - name: nginx
+      nginx__upstream: 'true'
+
+  tasks:
+  - name: nginx config
+    include_tasks: nginx_config.yaml
+    loop:
+      - one
