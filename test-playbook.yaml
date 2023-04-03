@@ -1,0 +1,210 @@
+---
+- name: Installer LEMP et WordPress
+  hosts: wordpress
+  become: yes
+  vars:
+    db_name: wordpress
+    db_user: wordpress
+    db_password: your_db_password
+    phpmyadmin_root_password: your_phpmyadmin_root_password
+  tasks:
+    - name: Installer les paquets nécessaires
+      apt:
+        name:
+          - nginx
+          - mysql-server
+          - php-fpm
+          - php-mysql
+          - php-curl
+          - php-gd
+          - php-intl
+          - php-mbstring
+          - php-soap
+          - php-xml
+          - php-xmlrpc
+          - php-zip
+        state: present
+
+    - name: Créer la base de données pour WordPress
+      mysql_db:
+        name: "{{ db_name }}"
+        state: present
+
+    - name: Créer un utilisateur pour WordPress et accorder les privilèges
+      mysql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        priv: "{{ db_name }}.*:ALL"
+        state: present
+
+    - name: Installer PhpMyAdmin
+      apt:
+        name: phpmyadmin
+        state: present
+
+    - name: Configurer PhpMyAdmin
+      blockinfile:
+        path: /etc/phpmyadmin/config.inc.php
+        block: |
+          $cfg['Servers'][$i]['AllowRoot'] = TRUE;
+          $cfg['Servers'][$i]['AllowNoPassword'] = TRUE;
+          $cfg['Servers'][$i]['auth_type'] = 'config';
+          $cfg['Servers'][$i]['user'] = 'root';
+          $cfg['Servers'][$i]['password'] = '{{ phpmyadmin_root_password }}';
+
+    - name: Télécharger WordPress
+      get_url:
+        url: https://wordpress.org/latest.tar.gz
+        dest: /tmp/wordpress.tar.gz
+
+    - name: Extraire WordPress
+      unarchive:
+        src: /tmp/wordpress.tar.gz
+        dest: /var/www
+        remote_src: yes
+        creates: /var/www/wordpress
+
+    - name: Copier wp-config-sample.php vers wp-config.php
+      command: cp wp-config-sample.php wp-config.php
+      args:
+        chdir: /var/www/wordpress
+        creates: /var/www/wordpress/wp-config.php
+
+    - name: Configurer WordPress
+      blockinfile:
+        path: /var/www/wordpress/wp-config.php
+        insertafter: "define('DB_COLLATE', '');"
+        block: |
+          define('DB_NAME', '{{ db_name }}');
+          define('DB_USER', '{{ db_user }}');
+          define('DB_PASSWORD', '{{ db_password }}');
+
+    - name: Configurer Nginx pour WordPress
+      template:
+        src: nginx-wordpress.conf.j2
+        dest: /etc/nginx/sites-available/wordpress
+      notify: redémarrer nginx
+
+    - name: Activer la configuration Nginx pour WordPress
+      file:
+        src: /etc/nginx/sites-available/wordpress
+        dest: /etc/nginx/sites-enabled/wordpress
+        state: link
+
+    - name: Supprimer la configuration Nginx par défaut
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: redémarrer nginx
+
+  handlers:
+    - name: redémarrer nginx
+      service:
+        name: nginx
+        state: restarted
+
+# TODO Conf a ajouter pour config wp am l'install
+# version: '3.3'
+
+# services:
+#   db:
+#     image: mysql:5.7
+#     volumes:
+#       - db_data:/var/lib/mysql
+      #   - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      # command: --init-file /docker-entrypoint-initdb.d/init.sql
+#     restart: always
+#     environment:
+#       MYSQL_ROOT_PASSWORD: password
+#       MYSQL_DATABASE: wordpress
+#       MYSQL_USER: wordpress
+#       MYSQL_PASSWORD: wordpress
+
+#   wordpress:
+#     depends_on:
+#       - db
+#     image: wordpress:latest
+#     ports:
+#       - "80:80"
+#     restart: always
+#     environment:
+#       WORDPRESS_DB_HOST: db:3306
+#       WORDPRESS_DB_USER: wordpress
+#       WORDPRESS_DB_PASSWORD: wordpress
+#       WORDPRESS_DB_NAME: wordpress
+#       WORDPRESS_TABLE_PREFIX: wp_
+#       WORDPRESS_DEBUG: 0
+#       WORDPRESS_CONFIG_EXTRA: "define('WP_SITEURL', 'http://example.com'); define('WP_HOME', 'http://example.com');"
+#     volumes:
+#       - ./html:/var/www/html
+
+# volumes:
+#   db_data: {}
+
+# TODO Fichier init.sql a creer pour pre-configurer la db wp
+# CREATE DATABASE IF NOT EXISTS wordpress;
+# CREATE USER IF NOT EXISTS 'wordpress'@'%' IDENTIFIED BY 'wordpress';
+# GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpress'@'%';
+# FLUSH PRIVILEGES;
+
+# USE wordpress;
+
+# SET @ADMIN_USERNAME = 'admin';
+# SET @ADMIN_EMAIL = 'admin@example.com';
+# SET @ADMIN_PASSWORD = 'your_password';
+# SET @SITE_TITLE = 'Your Site Title';
+# SET @SITE_URL = 'http://example.com';
+
+# INSERT INTO wp_users (user_login, user_pass, user_nicename, user_email, user_registered, user_status, display_name)
+# VALUES (@ADMIN_USERNAME, MD5(@ADMIN_PASSWORD), @ADMIN_USERNAME, @ADMIN_EMAIL, NOW(), 0, @ADMIN_USERNAME);
+
+# SET @ADMIN_USER_ID = LAST_INSERT_ID();
+
+# INSERT INTO wp_usermeta (user_id, meta_key, meta_value)
+# VALUES (@ADMIN_USER_ID, 'wp_capabilities', 'a:1:{s:13:"administrator";s:1:"1";}');
+
+# INSERT INTO wp_usermeta (user_id, meta_key, meta_value)
+# VALUES (@ADMIN_USER_ID, 'wp_user_level', '10');
+
+# INSERT INTO wp_options (option_name, option_value, autoload)
+# VALUES ('siteurl', @SITE_URL, 'yes'),
+#        ('home', @SITE_URL, 'yes'),
+#        ('blogname', @SITE_TITLE, 'yes'),
+#        ('admin_email', @ADMIN_EMAIL, 'yes'),
+#        ('new_admin_email', @ADMIN_EMAIL, 'yes');
+
+# ? Exemple playbook 
+# - hosts: target_host
+#   gather_facts: yes
+#   become: yes
+#   tasks:
+#     - name: Ensure Docker is installed
+#       ansible.builtin.package:
+#         name: docker.io
+#         state: present
+
+#     - name: Ensure Docker Compose is installed
+#       ansible.builtin.package:
+#         name: docker-compose
+#         state: present
+
+#     - name: Create working directory
+#       ansible.builtin.file:
+#         path: /opt/wordpress-compose
+#         state: directory
+
+#     - name: Copy docker-compose.yml to the target host
+#       ansible.builtin.copy:
+#         src: docker-compose.yml
+#         dest: /opt/wordpress-compose/docker-compose.yml
+
+#     - name: Copy init.sql to the target host
+#       ansible.builtin.copy:
+#         src: init.sql
+#         dest: /opt/wordpress-compose/init.sql
+
+#     - name: Ensure WordPress containers are running
+#       community.docker.docker_compose:
+#         project_src: /opt/wordpress-compose
+#         state: present
+#         restarted: yes

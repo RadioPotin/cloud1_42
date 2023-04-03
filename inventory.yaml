@@ -2,4 +2,4 @@ all:
   children:
       virtualmachines:
           hosts:
-              trainingvm:
+              trainingvm: # faire des hosts var => voir le .yaml correspondant au host var

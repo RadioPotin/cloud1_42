@@ -1,6 +1,7 @@
 ---
 - name: Testing training vm
   hosts: virtualmachines
+  # faire var group globales pour diff host var et group
   vars:
     index_root: "/var/www/html"
     sites_enabled: "/etc/nginx/sites-enabled"
