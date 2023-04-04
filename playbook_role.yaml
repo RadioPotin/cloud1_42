@@ -26,3 +26,18 @@
     include_tasks: nginx_config.yaml
     loop:
       - one
+
+# ---
+# - name: Install WordPress, MySQL, Nginx, and PHP-FPM
+#   hosts: all
+#   remote_user: root
+#   # remote_user: user
+#   # become: yes
+#   # become_method: sudo
+
+#   roles:
+#     - common
+#     - mysql
+#     - nginx
+#     - php-fpm
+#     - wordpress
