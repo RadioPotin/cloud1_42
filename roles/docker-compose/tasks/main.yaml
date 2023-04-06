@@ -1,34 +1,30 @@
-- hosts: target_host
-  # gather_facts: yes
-  # become: yes
-  tasks:
-    - name: Ensure Docker is installed
-      ansible.builtin.package:
-        name: docker.io
-        state: present
+  - name: Ensure Docker is installed
+    package:
+      name: docker.io
+      state: present
 
-    - name: Ensure Docker Compose is installed
-      ansible.builtin.package:
-        name: docker-compose
-        state: present
+  - name: Ensure Docker Compose is installed
+    package:
+      name: docker-compose
+      state: present
 
-    - name: Create working directory
-      ansible.builtin.file:
-        path: /opt/wordpress-compose
-        state: directory
+  - name: Create working directory
+    file:
+      path: /home/wordpress-compose
+      state: directory
 
-    - name: Copy docker-compose.yml to the target host
-      ansible.builtin.copy:
-        src: docker-compose.yml
-        dest: /opt/wordpress-compose/docker-compose.yml
+  - name: Copy docker-compose.yaml to the target host
+    copy:
+      src: ./templates/docker-compose.yaml
+      dest: /home/wordpress-compose/docker-compose.yaml
 
-    - name: Copy init.sql to the target host
-      ansible.builtin.copy:
-        src: init.sql
-        dest: /opt/wordpress-compose/init.sql
+  - name: Copy base files
+    synchronize:
+      src: files/
+      dest: /home/wordpress-compose/
 
-    - name: Ensure WordPress containers are running
-      community.docker.docker_compose:
-        project_src: /opt/wordpress-compose
-        state: present
-        restarted: yes
+  - name: Ensure WordPress containers are running
+    docker_compose:
+      project_src: /home/wordpress-compose
+      state: present
+      restarted: yes

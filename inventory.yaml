@@ -1,5 +1,6 @@
-all:
+all: # default all group / parent group
   children:
-      virtualmachines:
+      virtualmachines: # children / subgroup called virtualmachines
           hosts:
-              trainingvm: # faire des hosts var => voir le .yaml correspondant au host var
+              cloud_1_host_1: # faire des hosts var => voir le .yaml correspondant au host var
+              # cloud_1_host_2:

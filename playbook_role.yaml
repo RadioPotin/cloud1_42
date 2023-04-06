@@ -1,13 +1,13 @@
 ---
-- name: Testing training vm with enix nginx role
+- name: Cloud1 Projet ansible installer
   hosts: virtualmachines
   pre_tasks:
   - name: ping hosts
     ping:
   - name: print basic test msg
     debug:
-      msg: Everything seems OK
-  - name:
+      msg: Everything seems OK - hosts are responding
+  - name: install gpg tool
     apt:
       name: gpg
       state: latest
@@ -17,27 +17,4 @@
       cache_valid_time: 3600
 
   roles:
-    - name: nginx
-      nginx__upstream: 'true'
-
-# loop
-  tasks:
-  - name: nginx config
-    include_tasks: nginx_config.yaml
-    loop:
-      - one
-
-# ---
-# - name: Install WordPress, MySQL, Nginx, and PHP-FPM
-#   hosts: all
-#   remote_user: root
-#   # remote_user: user
-#   # become: yes
-#   # become_method: sudo
-
-#   roles:
-#     - common
-#     - mysql
-#     - nginx
-#     - php-fpm
-#     - wordpress
+    - name: docker-compose
