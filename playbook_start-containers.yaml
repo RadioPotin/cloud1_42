@@ -1,0 +1,8 @@
+- name: Start containers
+  hosts: virtualmachines
+  tasks:
+  - name: Start WordPress containers 
+    docker_compose:
+      project_src: /home/wordpress-compose
+      state: present
+      stopped: false

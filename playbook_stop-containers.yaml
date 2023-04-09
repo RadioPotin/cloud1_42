@@ -1,0 +1,9 @@
+---
+- name: Stop containers
+  hosts: virtualmachines
+  tasks:
+  - name: Ensure WordPress containers are stopped
+    docker_compose:
+      project_src: /home/wordpress-compose
+      state: present
+      stopped: true
