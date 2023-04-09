@@ -13,6 +13,21 @@
       path: /home/wordpress-compose
       state: directory
 
+  # - name: Install Apache
+  #   apt:
+  #     name: apache2
+  #     state: present
+
+  # - name: Install the Apache2 module proxy
+  #   apache2_module:
+  #     state: present
+  #     name: proxy
+
+  # - name: Install the Apache2 module proxy_http
+  #   apache2_module:
+  #     state: present
+  #     name: proxy_http
+
   - name: Copy docker-compose.yaml to the target host
     copy:
       src: ./templates/docker-compose.yaml
