@@ -1,6 +1,7 @@
 ---
 - name: Clear training vm
   hosts: virtualmachines
+  strategy: free
   tasks:
   - name: autoremove dangling packages
     apt:

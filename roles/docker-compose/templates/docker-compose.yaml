@@ -45,7 +45,6 @@ services:
     depends_on:
       - wordpress_db
     image: phpmyadmin/phpmyadmin
-    # Uncomment to have access to db manager
     ports:
       - 8181:8181
     restart: always
@@ -55,6 +54,7 @@ services:
       MYSQL_ROOT_PASSWORD: examplepass
       APACHE_PORT: 8181
 
+  # * Temp container to init website db
   setup:
     image: alpine
     depends_on:

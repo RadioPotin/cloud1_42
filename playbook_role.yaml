@@ -1,6 +1,7 @@
 ---
 - name: Cloud1 Projet ansible installer
   hosts: virtualmachines
+  strategy: free
   pre_tasks:
   - name: ping hosts
     ping:
