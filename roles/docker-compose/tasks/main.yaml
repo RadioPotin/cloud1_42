@@ -13,20 +13,39 @@
       path: /home/wordpress-compose
       state: directory
 
-  # - name: Install Apache
-  #   apt:
-  #     name: apache2
-  #     state: present
+  - name: Create ssl directory
+    file:
+      path: /home/wordpress-compose/ssl
+      state: directory
 
-  # - name: Install the Apache2 module proxy
-  #   apache2_module:
-  #     state: present
-  #     name: proxy
+  - name: Create ssl cert sub-directory
+    file:
+      path: /home/wordpress-compose/ssl/certs
+      state: directory
 
-  # - name: Install the Apache2 module proxy_http
-  #   apache2_module:
-  #     state: present
-  #     name: proxy_http
+  - name: Create ssl private sub-directory
+    file:
+      path: /home/wordpress-compose/ssl/private
+      state: directory
+
+  - name: Print host name
+    debug:
+      msg: Target host is {{ ansible_host }}
+
+  - name: Create simple private key
+    community.crypto.openssl_privatekey:
+      path: /home/wordpress-compose/ssl/private/key.pem
+
+  - name: Create simple self-signed certificate
+    community.crypto.x509_certificate:
+      path: /home/wordpress-compose/ssl/certs/cert.pem
+      privatekey_path: /home/wordpress-compose/ssl/private/key.pem
+      provider: selfsigned
+
+  - name: Render nginx conf template
+    template:
+      src: ./default.conf.j2
+      dest: /home/wordpress-compose/default.conf
 
   - name: Copy docker-compose.yaml to the target host
     copy:

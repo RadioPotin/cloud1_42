@@ -13,12 +13,6 @@
       state: absent
       remove_volumes: true
 
-  # - name: Remove volumes
-  #   docker_compose:
-  #     project_src: /home/wordpress-compose
-  #     remove_volumes: true
-  #     state: absent
-
   - name: Remove images
     docker_compose:
       project_src: /home/wordpress-compose
@@ -34,18 +28,3 @@
     file:
       path: /home/wordpress-compose/docker-compose.yaml
       state: absent
-
-  # - name: Remove Apache
-  #   apt:
-  #     name: apache2
-  #     state: absent
-
-  # - name: Remove the Apache2 module proxy
-  #   apache2_module:
-  #     state: absent
-  #     name: proxy
-
-  # - name: Remove the Apache2 module proxy_http
-  #   apache2_module:
-  #     state: absent
-  #     name: proxy_http

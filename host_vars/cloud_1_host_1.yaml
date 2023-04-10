@@ -1,4 +1,4 @@
 # host vars attached to vm host
-ansible_host: 45.140.108.23
+ansible_host: cloud1.host1.45.140.108.23.nip.io
 ansible_user: ubuntu
 ansible_become: true # important de garder playbook agnostiques et d'indiquer droit root au niveau inventory
