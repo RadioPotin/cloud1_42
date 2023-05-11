@@ -1,0 +1,6 @@
+all: # default all group / parent group
+  children:
+      virtualmachines: # children / subgroup called virtualmachines
+          hosts:
+              cloud_1_host_1:
+              cloud_1_host_2:

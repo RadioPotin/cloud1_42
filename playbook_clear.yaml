@@ -1,0 +1,31 @@
+---
+- name: Clear training vm
+  hosts: virtualmachines
+  strategy: free
+  tasks:
+  - name: autoremove dangling packages
+    apt:
+      autoremove: yes
+      autoclean: yes
+
+  - name: Ensure WordPress containers are stopped and removed with their volumes
+    docker_compose:
+      project_src: /home/wordpress-compose
+      state: absent
+      remove_volumes: true
+
+  - name: Remove images
+    docker_compose:
+      project_src: /home/wordpress-compose
+      remove_images: all
+      state: absent
+
+  - name: Remove working directory
+    file:
+      path: /home/wordpress-compose/
+      state: absent
+
+  - name: Remove docker-compose.yaml from the target host
+    file:
+      path: /home/wordpress-compose/docker-compose.yaml
+      state: absent

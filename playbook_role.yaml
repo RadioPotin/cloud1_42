@@ -1,0 +1,21 @@
+---
+- name: Cloud1 Projet ansible installer
+  hosts: virtualmachines
+  strategy: free
+  pre_tasks:
+  - name: ping hosts
+    ping:
+  - name: print basic test msg
+    debug:
+      msg: Everything seems OK - hosts are responding
+  - name: install gpg tool
+    apt:
+      name: gpg
+      state: latest
+  - name: Update apt cache
+    apt:
+      update_cache: yes
+      cache_valid_time: 3600
+
+  roles:
+    - name: docker-compose

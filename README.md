@@ -1,58 +1,50 @@
-# cloud1_42
+# Training Ansible
 
-## Automated Deployment on the Cloud
+## Basic commands
 
-This project `cloud1` is an introduction to automated deployment on the cloud using the famous automation tool Ansible.
+Run the playbook, like this:
 
-## Requirements
+`ansible-playbook -i inventory.yaml playbook_role.yaml`
 
-The subject states:
+To delete everything, use this:
 
-* Your site can restart automatically if the server is rebooted.
-* In case of reboot all the data of the site are persisted (images, user accounts, articles, ...).
-* It is possible to deploy your site on several servers in parallel.
-* The script must be able to function in an automated way with for only assumption an ubuntu 20.04 LTS like OS of the target instance running an SSH daemon and
-*ith Python installed.
-* Your applications will run in separate containers that can communicate with each other (1 process = 1 container)
-* Public access to your server must be limited and secure (for example, it is not possible to connect directly to your database from the internet).
-* The services will be the different components of a WordPress to install by yourself. For example Phpmyadmin, MySQL, ...
-* You must have a docker-compose.yml.
-* You will need to ensure that your SQL database works with WordPress and PHP-MyAdmin.
-* Your server should be able, when possible, to use TLS.
-* You will need to make sure that, depending on the URL requested, your server redirects to the correct site.
+`ansible-playbook -i inventory.yaml playbook_clear.yaml`
 
-## Repository Structure
+To stop / start containers on a specific machine, use this:
 
-```tree
-.
+`ansible-playbook -l cloud_1_host_1 playbook_start-containers.yaml`
+
+## Dir overview
+
+```
+├── README.md
 ├── ansible.cfg
 ├── group_vars
-│   ├── all
-│   │   ├── vars.yml
-│   │   └── vault.yml
-│   └── cloud1
-│       └── vars.yml
-├── inventory.yml
-├── playbooks
-│   └── init
-│       └── cloud_1.yml
-├── README.md
+│   └── virtualmachines.yaml
+├── host_vars
+│   ├── cloud_1_host_1.yaml
+│   └── cloud_1_host_2.yaml
+├── inventory
+│   └── hosts.ini
+├── inventory.yaml
+├── playbook_clear.yaml
+├── playbook_role.yaml
+├── playbook_start-containers.yaml
+├── playbook_stop-containers.yaml
 └── roles
-    ├── docker
-    │   └── tasks
-    │       └── main.yml
-    ├── hosts
-    │   └── tasks
-    │       └── main.yml
-    ├── update
-    │   └── tasks
-    │       └── main.yml
-    └── user
-        └── tasks
-            └── main.yml
-```
+    └── docker-compose
+        ├── files
+        │   ├── hey.html
+        │   ├── html/
+        │   └── wordpressdb.sql
+        ├── tasks
+        │   └── main.yaml
+        └── templates
+            ├── default.conf.j2
+            └── docker-compose.yaml
+````
 
-- Groups under `group_vars/` either detail variables for a given target or all of them. The vault file will eventually hold all sensitive information and be encrypted with a secure password. This allows for specific variables to have specific values based on the target hosts or group of hosts.
-- `inventory.yml` define the structure of groups and hosts in the project in relation to the structure of the `group_vars/` directory.
-- `playbooks/init/`: each YAML file in this directory is mapped to a host or group and defines the order of execution of roles contained under `roles/`
-- `roles/` a set of generic tasks to be executed on a given host based on a given playbook.
+Helpful sources:
+- [Ansible wordpress nginx playbook example](https://github.com/ansible/ansible-examples/tree/master/wordpress-nginx)
+- [Xavki ansible tutorial](https://gitlab.com/xavki/devopsland/-/tree/master/ansible)
+

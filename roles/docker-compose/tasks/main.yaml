@@ -1,0 +1,64 @@
+  - name: Ensure Docker is installed
+    package:
+      name: docker.io
+      state: present
+
+  - name: Ensure Docker Compose is installed
+    package:
+      name: docker-compose
+      state: present
+
+  - name: Create working directory
+    file:
+      path: /home/wordpress-compose
+      state: directory
+
+  - name: Create ssl directory
+    file:
+      path: /home/wordpress-compose/ssl
+      state: directory
+
+  - name: Create ssl cert sub-directory
+    file:
+      path: /home/wordpress-compose/ssl/certs
+      state: directory
+
+  - name: Create ssl private sub-directory
+    file:
+      path: /home/wordpress-compose/ssl/private
+      state: directory
+
+  - name: Print host name
+    debug:
+      msg: Target host is {{ ansible_host }}
+
+  - name: Create simple private key
+    community.crypto.openssl_privatekey:
+      path: /home/wordpress-compose/ssl/private/key.pem
+
+  - name: Create simple self-signed certificate
+    community.crypto.x509_certificate:
+      path: /home/wordpress-compose/ssl/certs/cert.pem
+      privatekey_path: /home/wordpress-compose/ssl/private/key.pem
+      provider: selfsigned
+
+  - name: Render nginx conf template
+    template:
+      src: ./default.conf.j2
+      dest: /home/wordpress-compose/default.conf
+
+  - name: Copy docker-compose.yaml to the target host
+    copy:
+      src: ./templates/docker-compose.yaml
+      dest: /home/wordpress-compose/docker-compose.yaml
+
+  - name: Copy base files
+    synchronize:
+      src: files/
+      dest: /home/wordpress-compose/
+
+  - name: Ensure WordPress containers are running
+    docker_compose:
+      project_src: /home/wordpress-compose
+      state: present
+      restarted: yes
