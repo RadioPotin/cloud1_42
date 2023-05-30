@@ -20,10 +20,10 @@ services:
       - 9000:9000
     restart: always
     environment:
-      WORDPRESS_DB_HOST: wordpress_db:3306
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: wordpress
-      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_HOST: {{ vault_wordpress_db_host }}
+      WORDPRESS_DB_USER: {{ vault_wordpress_db_user }}
+      WORDPRESS_DB_PASSWORD: {{ vault_wordpress_db_password }}
+      WORDPRESS_DB_NAME: {{ vault_wordpress_db_name }}
       WORDPRESS_TABLE_PREFIX: wp_
       WORDPRESS_DEBUG: 0
     volumes:
@@ -35,11 +35,11 @@ services:
       - db_data:/var/lib/mysql
     restart: always
     environment:
-      MYSQL_HOST: wordpress_db
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: wordpress
+      MYSQL_HOST: {{ vault_mysql_host }}
+      MYSQL_ROOT_PASSWORD: {{ vault_mysql_root_password }}
+      MYSQL_DATABASE: {{ vault_mysql_db }}
+      MYSQL_USER: {{ vault_mysql_user }}
+      MYSQL_PASSWORD: {{ vault_mysql_password }}
 
   phpmyadmin:
     depends_on:
@@ -49,9 +49,9 @@ services:
       - 8181:8181
     restart: always
     environment:
-      MYSQL_HOST: wordpress_db
-      PMA_HOST: wordpress_db
-      MYSQL_ROOT_PASSWORD: examplepass
+      MYSQL_HOST: {{ vault_mysql_host }}
+      PMA_HOST: {{ vault_pma_host }}
+      MYSQL_ROOT_PASSWORD: {{ vault_pma_pwd }}
       APACHE_PORT: 8181
 
   # * Temp container to init website db
@@ -61,7 +61,7 @@ services:
       - wordpress_db
     volumes:
       - ./wordpressdb.sql:/tmp/wordpressdb.sql
-    command: sh -c "apk add mysql-client && sleep 30 && mysql -u root --password=password -h wordpress_db wordpress < /tmp/wordpressdb.sql"
+    command: sh -c "apk add mysql-client && sleep 30 && mysql -u root --password={{ vault_mysql_root_password }} -h {{ vault_mysql_host }} {{ vault_mysql_db }} < /tmp/wordpressdb.sql"
 
 volumes:
   db_data:

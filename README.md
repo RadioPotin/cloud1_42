@@ -4,7 +4,7 @@
 
 Run the playbook, like this:
 
-`ansible-playbook -i inventory.yaml playbook_role.yaml`
+`ansible-playbook --ask-vault-pass -i inventory.yaml playbook_role.yaml`
 
 To delete everything, use this:
 
