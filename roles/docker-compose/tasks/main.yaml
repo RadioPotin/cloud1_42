@@ -1,47 +1,3 @@
-  - name: Ensure Docker is installed
-    package:
-      name: docker.io
-      state: present
-
-  - name: Ensure Docker Compose is installed
-    package:
-      name: docker-compose
-      state: present
-
-  - name: Create working directory
-    file:
-      path: /home/wordpress-compose
-      state: directory
-
-  - name: Create ssl directory
-    file:
-      path: /home/wordpress-compose/ssl
-      state: directory
-
-  - name: Create ssl cert sub-directory
-    file:
-      path: /home/wordpress-compose/ssl/certs
-      state: directory
-
-  - name: Create ssl private sub-directory
-    file:
-      path: /home/wordpress-compose/ssl/private
-      state: directory
-
-  - name: Print host name
-    debug:
-      msg: Target host is {{ ansible_host }}
-
-  - name: Create simple private key
-    community.crypto.openssl_privatekey:
-      path: /home/wordpress-compose/ssl/private/key.pem
-
-  - name: Create simple self-signed certificate
-    community.crypto.x509_certificate:
-      path: /home/wordpress-compose/ssl/certs/cert.pem
-      privatekey_path: /home/wordpress-compose/ssl/private/key.pem
-      provider: selfsigned
-
   - name: Render nginx conf template
     template:
       src: ./default.conf.j2
@@ -51,11 +7,6 @@
     template:
       src: ./docker-compose.yaml.j2
       dest: /home/wordpress-compose/docker-compose.yaml
-
-  # - name: Copy docker-compose.yaml to the target host
-  #   copy:
-  #     src: ./templates/docker-compose.yaml
-  #     dest: /home/wordpress-compose/docker-compose.yaml
 
   - name: Copy base files
     synchronize:
@@ -67,17 +18,3 @@
       project_src: /home/wordpress-compose
       state: present
       restarted: yes
-
-  - name: Run a simple command (command)
-    community.docker.docker_container_exec:
-      container: wordpress-compose_wordpress_1
-      command: /bin/bash -c "wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp"
-      chdir: /tmp
-    register: result
-
-  - name: Run a simple command (command)
-    community.docker.docker_container_exec:
-      container: wordpress-compose_wordpress_1
-      command: /bin/bash -c "wp --allow-root core install --url={{ ansible_host }} --title='Cloud1 super site weesh' --admin_user=admin --admin_password={{ vault_wordpress_db_password }} --admin_email=cloud1@mail.com --skip-email"
-      chdir: /var/www/html
-    register: result

@@ -1,0 +1,24 @@
+  - name: Create ssl directory
+    file:
+      path: /home/wordpress-compose/ssl
+      state: directory
+
+  - name: Create ssl cert sub-directory
+    file:
+      path: /home/wordpress-compose/ssl/certs
+      state: directory
+
+  - name: Create ssl private sub-directory
+    file:
+      path: /home/wordpress-compose/ssl/private
+      state: directory
+
+  - name: Create simple private key
+    community.crypto.openssl_privatekey:
+      path: /home/wordpress-compose/ssl/private/key.pem
+
+  - name: Create simple self-signed certificate
+    community.crypto.x509_certificate:
+      path: /home/wordpress-compose/ssl/certs/cert.pem
+      privatekey_path: /home/wordpress-compose/ssl/private/key.pem
+      provider: selfsigned
