@@ -46,7 +46,7 @@ services:
       - wordpress_db
     image: phpmyadmin/phpmyadmin
     ports:
-      - 8181:8181
+      - 127.0.0.1:8181:8181
     restart: always
     environment:
       MYSQL_HOST: {{ vault_mysql_host }}
