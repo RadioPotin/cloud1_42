@@ -11,3 +11,52 @@
       command: /bin/bash -c "wp --allow-root core install --url={{ ansible_host }} --title='Cloud1 super site weesh' --admin_user=admin --admin_password={{ vault_wordpress_db_password }} --admin_email=cloud1@mail.com --skip-email"
       chdir: /var/www/html
     register: result
+
+  - name: Update website theme
+    community.docker.docker_container_exec:
+      container: wordpress-compose_wordpress_1
+      command: /bin/bash -c "wp --allow-root theme activate twentytwentytwo"
+      chdir: /var/www/html
+    register: result
+
+  - name: Update wordpress blog title
+    community.docker.docker_container_exec:
+      container: wordpress-compose_wordpress_1
+      command: /bin/bash -c "wp --allow-root option update blogname 'Cloud1'"
+      chdir: /var/www/html
+    register: result
+
+  - name: Update website blog description
+    community.docker.docker_container_exec:
+      container: wordpress-compose_wordpress_1
+      command: /bin/bash -c "wp --allow-root option update blogdescription 'This a splendid Cloud1 Project'"
+      chdir: /var/www/html
+    register: result
+
+  - name: Delete default website post
+    community.docker.docker_container_exec:
+      container: wordpress-compose_wordpress_1
+      command: /bin/bash -c "wp --allow-root post delete 1"
+      chdir: /var/www/html
+    register: result
+
+  - name: Add website post
+    community.docker.docker_container_exec:
+      container: wordpress-compose_wordpress_1
+      command: /bin/bash -c "wp --allow-root post create --post_type=post --post_title='I spent waaay to much time on this crappy project' --post-content='yaaay' --post_status=publish"
+      chdir: /var/www/html
+    register: result
+
+  - name: Delete default website page
+    community.docker.docker_container_exec:
+      container: wordpress-compose_wordpress_1
+      command: /bin/bash -c "wp --allow-root post delete 2"
+      chdir: /var/www/html
+    register: result
+
+  - name: Add website page
+    community.docker.docker_container_exec:
+      container: wordpress-compose_wordpress_1
+      command: /bin/bash -c "wp --allow-root post create --post_type=page --post_title='Cloud1 super page' --post_status=publish"
+      chdir: /var/www/html
+    register: result
