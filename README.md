@@ -4,15 +4,19 @@
 
 Run the playbook, like this:
 
-`ansible-playbook -i inventory.yaml playbook_role.yaml`
+`ansible-playbook --ask-vault-pass -i inventory.yaml playbook_role.yaml`
 
 To delete everything, use this:
 
-`ansible-playbook -i inventory.yaml playbook_clear.yaml`
+`ansible-playbook --ask-vault-pass -i inventory.yaml playbook_clear.yaml`
 
 To stop / start containers on a specific machine, use this:
 
-`ansible-playbook -l cloud_1_host_1 playbook_start-containers.yaml`
+`ansible-playbook --ask-vault-pass -l cloud_1_host_1 playbook_start-containers.yaml`
+
+To access database manager phpmyadmin from localhost (internet access is blocked by default)
+
+`ssh -L [local_ip:]local_port:remote_ip:remote_port user@remote_host`
 
 ## Dir overview
 
